@@ -45,7 +45,7 @@ class Cache:
         self._redis = redis.Redis()
         """Flush all keys in the database"""
         self._redis.flushdb
-    
+
     """Now, pass the store method to the count_calls decorator functn"""
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
@@ -53,7 +53,7 @@ class Cache:
         dBaseKey = str(uuid4())
         self._redis.set(dBaseKey, data)
         return dBaseKey
-    
+
     def get(self, key: str,
             fn: Optional[Callable] = None) -> Union[str, bytes, int, float]:
         """A function to convert the returned data from db back to
@@ -70,8 +70,8 @@ class Cache:
         function"""
         val = self._redis.get(key)
         return val.decode("utf-8")
-    
-    def get_int(self, key:str) -> str:
+
+    def get_int(self, key: str) -> str:
         """Automatically parametrize Cache.get with correct conversion
         function"""
         val = self._redis.get(key)
