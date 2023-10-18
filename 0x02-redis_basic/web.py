@@ -11,32 +11,33 @@ import requests
 redis = redis.Redis()
 
 
-def wrap_requests(fn: Callable) -> Callable:
+def wrap_get_page(fxn: Callable) -> Callable:
     """A decorated function definition for the cache"""
 
-    @wraps(fn)
+    @wraps(fxn)
     def wrapper(url):
         """A wrapper function for the get_page function"""
 
-        """Create key and automatically set & increase it's value by 1"""
+        """Track how many times a particular URL was accessed in the
+        key count:{url} by creating key and automatically setting &
+        increasing it's value by 1 per access"""
         redis.incr(f"count:{url}")
 
-        """Get cached key, if found, decode and return its value as str,
-        else set the key and its value as get_page() return value with 10 secs
-        expiration time"""
-
+        """Get cached data, if found, decode and return it as str,
+        else set cached key and fix its value as get_page() return
+        value with 10 secs expiration time"""
         cached_response = redis.get(f"cached:{url}")
         if cached_response:
             return cached_response.decode('utf-8')
-        newVal = fn(url)
+        newVal = fxn(url)
         redis.setex(f"cached:{url}", 10, newVal)
         return newVal
 
     return wrapper
 
 
-@wrap_requests
+@wrap_get_page
 def get_page(url: str) -> str:
     """A function that get the body of a particular url"""
-    response = requests.get(url)
-    return response.text
+    req = requests.get(url)
+    return req.text

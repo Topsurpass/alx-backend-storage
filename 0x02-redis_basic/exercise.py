@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
+"""Writing to redis database using python in place of
+    redis shell."""
 
 from typing import Callable, Optional, Union
 from uuid import uuid4
 import redis
 from functools import wraps
-
-'''
-    Writing to redis database using python in place of
-    redis shell.
-'''
 
 
 def count_calls(method: Callable) -> Callable:
