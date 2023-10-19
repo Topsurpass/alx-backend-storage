@@ -8,7 +8,7 @@ from functools import wraps
 import requests
 
 """Establish connection to the database using default details"""
-redis = redis.Redis()
+redisdb = redis.Redis()
 
 
 def wrap_get_page(fxn: Callable) -> Callable:
@@ -21,16 +21,16 @@ def wrap_get_page(fxn: Callable) -> Callable:
         """Track how many times a particular URL was accessed in the
         key count:{url} by creating key and automatically setting &
         increasing it's value by 1 per access"""
-        redis.incr(f"count:{url}")
+        redisdb.incr(f"count:{url}")
 
         """Get cached data, if found, decode and return it as str,
         else set cached key and fix its value as get_page() return
         value with 10 secs expiration time"""
-        cached_response = redis.get(f"cached:{url}")
+        cached_response = redisdb.get(f"cached:{url}")
         if cached_response:
             return cached_response.decode('utf-8')
         newVal = fxn(url)
-        redis.setex(f"cached:{url}", 10, newVal)
+        redisdb.setex(f"cached:{url}", 10, newVal)
         return newVal
 
     return wrapper
