@@ -30,8 +30,7 @@ def wrap_get_page(fxn: Callable) -> Callable:
         if cached_response:
             return cached_response.decode('utf-8')
         newVal = fxn(url)
-        redisdb.set(f"cached:{url}", 0)
-        redisdb.setex(f"cached:{url}", 10, newVal)
+        redisdb.set(f"cached:{url}", newVal, ex=10)
         return newVal
 
     return wrapper
